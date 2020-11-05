@@ -1,15 +1,13 @@
 package com.adelannucci.img_app
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.adelannucci.img_app.network.Photo
 import com.adelannucci.img_app.network.PhotoData
 import com.adelannucci.img_app.network.RetrofitInitializer
 import com.adelannucci.img_app.ui.ImageGridAdapter
-import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,8 +24,13 @@ class MainActivity : AppCompatActivity() {
         val call = RetrofitInitializer().PhotoService().getProperties(1)
         call.enqueue(object : Callback<PhotoData?> {
             override fun onResponse(call: Call<PhotoData?>, response: Response<PhotoData?>) {
-                response?.body()?.let {
-                    val imgs = it
+                response?.body()?.let { item: PhotoData ->
+                    val imageList = ArrayList<String>()
+                    imageList.addAll(item.data.map {
+                        it.link
+//                        "https://i.imgur.com/" + it.id + "." + it.type
+                    })
+                    rv.adapter = ImageGridAdapter(this@MainActivity , imageList)
                 }
             }
 

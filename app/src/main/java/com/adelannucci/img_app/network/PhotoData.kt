@@ -7,4 +7,5 @@ data class PhotoData(
 
 
 data class Photo(val id: String,
+                 val type: String,
                  val link: String)
