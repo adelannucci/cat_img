@@ -2,9 +2,17 @@ package com.adelannucci.img_app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.adelannucci.img_app.network.Photo
+import com.adelannucci.img_app.network.PhotoData
+import com.adelannucci.img_app.network.RetrofitInitializer
 import com.adelannucci.img_app.ui.ImageGridAdapter
+import com.google.gson.Gson
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,6 +21,21 @@ class MainActivity : AppCompatActivity() {
 
         val rv : RecyclerView = findViewById(R.id.rv)
         rv.layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
+
+
+        val call = RetrofitInitializer().PhotoService().getProperties(1)
+        call.enqueue(object : Callback<PhotoData?> {
+            override fun onResponse(call: Call<PhotoData?>, response: Response<PhotoData?>) {
+                response?.body()?.let {
+                    val imgs = it
+                }
+            }
+
+            override fun onFailure(call: Call<PhotoData?>?, t: Throwable?) {
+                Log.e("onFailure error", t?.message)
+            }
+        })
+
 
         val imageList = ArrayList<String>()
         imageList.add("https://thumbs.dreamstime.com/b/halloween-cat-wearing-pointed-witches-hat-sitting-amongst-pumpkins-doorstep-rustic-cabin-blue-door-101483600.jpg")
