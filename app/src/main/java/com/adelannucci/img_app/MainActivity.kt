@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.adelannucci.img_app.network.PhotoData
 import com.adelannucci.img_app.network.RetrofitInitializer
 import com.adelannucci.img_app.ui.ImageGridAdapter
@@ -13,42 +14,72 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
+
+    private var page = 0
+    private val adapter = ImageGridAdapter(this)
+    private var rv: RecyclerView? = null
+    private var loading = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val rv : RecyclerView = findViewById(R.id.rv)
-        rv.layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
+        rv = findViewById(R.id.photos)
+        rv?.layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
+        rv?.adapter = adapter
 
+        fetch()
+        rv?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0) {
 
-        val call = RetrofitInitializer().PhotoService().getProperties(1)
+                    val visibleItemCount = rv?.childCount ?: 0
+                    val totalItemCount = adapter.itemCount
+
+                    val firstVisibleItems: IntArray =
+                        (rv?.layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(
+                            null
+                        )
+                    val pastVisibleItems =
+                        if (firstVisibleItems != null && firstVisibleItems.size > 0) {
+                            firstVisibleItems[0]
+                        } else {
+                            0
+                        }
+
+                    if (!loading && (visibleItemCount + pastVisibleItems >= totalItemCount)) {
+                        fetch()
+                    }
+                }
+            }
+        })
+    }
+
+    private fun fetch() {
+        page += 1
+        loading = true
+        val call = RetrofitInitializer().PhotoService().getProperties(page, "cats")
         call.enqueue(object : Callback<PhotoData?> {
             override fun onResponse(call: Call<PhotoData?>, response: Response<PhotoData?>) {
                 response?.body()?.let { item: PhotoData ->
                     val imageList = ArrayList<String>()
                     imageList.addAll(item.data.map {
-                        it.link
-//                        "https://i.imgur.com/" + it.id + "." + it.type
+                        val id = if (it.isAlbum) {
+                            it.cover
+                        } else {
+                            it.id
+                        }
+                        "https://i.imgur.com/$id.jpg"
                     })
-                    rv.adapter = ImageGridAdapter(this@MainActivity , imageList)
+                    loading = false
+                    adapter.updateList(imageList)
                 }
             }
 
             override fun onFailure(call: Call<PhotoData?>?, t: Throwable?) {
                 Log.e("onFailure error", t?.message)
+                loading = false
             }
         })
-
-
-        val imageList = ArrayList<String>()
-        imageList.add("https://thumbs.dreamstime.com/b/halloween-cat-wearing-pointed-witches-hat-sitting-amongst-pumpkins-doorstep-rustic-cabin-blue-door-101483600.jpg")
-        imageList.add("https://thumbs.dreamstime.com/b/cute-red-cat-cardboard-box-background-wooden-planks-close-up-88881992.jpg")
-        imageList.add("https://thumbs.dreamstime.com/b/pet-cat-green-cats-eyes-gray-big-102425920.jpg")
-        imageList.add("https://thumbs.dreamstime.com/b/cat-eyes-835113.jpg")
-        imageList.add("https://thumbs.dreamstime.com/b/cat-playing-toy-young-tabby-wit-mouse-97067866.jpg")
-        imageList.add("https://thumbs.dreamstime.com/b/young-kitten-cat-meowing-green-grass-funny-97243585.jpg")
-        imageList.add("https://thumbs.dreamstime.com/b/portrait-funny-cat-fly-his-nose-portrait-funny-cat-fly-his-nose-isolated-white-background-125606127.jpg")
-
-        rv.adapter = ImageGridAdapter(this, imageList)
     }
 }

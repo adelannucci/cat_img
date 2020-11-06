@@ -12,7 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.adelannucci.img_app.R
 import com.squareup.picasso.Picasso
 
-class ImageGridAdapter(private val c: Context, private val images: ArrayList<String>) :
+class ImageGridAdapter(
+    private val c: Context,
+    private val images: ArrayList<String> = ArrayList<String>()
+) :
     RecyclerView.Adapter<ImageGridAdapter.ViewHolder>() {
 
 
@@ -39,8 +42,11 @@ class ImageGridAdapter(private val c: Context, private val images: ArrayList<Str
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val image : ImageView = itemView.findViewById<ImageView>(R.id.iv)
+        val image: ImageView = itemView.findViewById<ImageView>(R.id.iv)
     }
 
-
+    fun updateList(images: ArrayList<String>) {
+        this.images.addAll(images)
+        notifyDataSetChanged()
+    }
 }
