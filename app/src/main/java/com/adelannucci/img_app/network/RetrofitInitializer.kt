@@ -1,5 +1,6 @@
 package com.adelannucci.img_app.network
 
+import com.adelannucci.img_app.network.response.PhotoApi
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor

@@ -5,8 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.adelannucci.img_app.network.PhotoData
+import com.adelannucci.img_app.network.response.PhotoData
 import com.adelannucci.img_app.network.RetrofitInitializer
 import com.adelannucci.img_app.ui.ImageGridAdapter
 import retrofit2.Call

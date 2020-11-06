@@ -1,4 +1,4 @@
-package com.adelannucci.img_app.network
+package com.adelannucci.img_app.network.response
 
 import retrofit2.Call
 import retrofit2.http.GET
