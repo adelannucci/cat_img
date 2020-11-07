@@ -45,7 +45,7 @@ class ImageGridAdapter(
         val image: ImageView = itemView.findViewById<ImageView>(R.id.iv)
     }
 
-    fun updateList(images: ArrayList<String>) {
+    fun updateList(images: List<String>) {
         this.images.addAll(images)
         notifyDataSetChanged()
     }

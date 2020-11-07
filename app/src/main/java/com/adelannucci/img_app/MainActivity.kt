@@ -1,83 +1,55 @@
 package com.adelannucci.img_app
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.adelannucci.img_app.network.response.PhotoData
-import com.adelannucci.img_app.network.RetrofitInitializer
 import com.adelannucci.img_app.ui.ImageGridAdapter
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.adelannucci.img_app.ui.PhotoViewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private var page = 0
     private val adapter = ImageGridAdapter(this)
-    private var rv: RecyclerView? = null
-    private var loading = true
+    private var recyclerView: RecyclerView? = null
+    var viewModel: PhotoViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        rv = findViewById(R.id.photos)
-        rv?.layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
-        rv?.adapter = adapter
+        recyclerView = findViewById(R.id.photos)
+        recyclerView?.layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
+        recyclerView?.adapter = adapter
 
-        fetch()
-        rv?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        viewModel = ViewModelProvider(this).get(PhotoViewModel::class.java)
+        viewModel?.loadImages()?.observe(this, Observer { list ->
+            adapter.updateList(list)
+        })
+
+        recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) {
 
-                    val visibleItemCount = rv?.childCount ?: 0
+                    val visibleItemCount = this@MainActivity.recyclerView?.childCount ?: 0
                     val totalItemCount = adapter.itemCount
 
                     val firstVisibleItems: IntArray =
-                        (rv?.layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(
+                        (this@MainActivity.recyclerView?.layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(
                             null
                         )
-                    val pastVisibleItems =
-                        if (firstVisibleItems != null && firstVisibleItems.size > 0) {
-                            firstVisibleItems[0]
-                        } else {
-                            0
-                        }
 
-                    if (!loading && (visibleItemCount + pastVisibleItems >= totalItemCount)) {
-                        fetch()
+                    val pastVisibleItems = if (firstVisibleItems.isNotEmpty()) {
+                        firstVisibleItems[0]
+                    } else {
+                        0
+                    }
+
+                    if ((visibleItemCount + pastVisibleItems >= totalItemCount)) {
+                        viewModel?.loadImages()
                     }
                 }
-            }
-        })
-    }
-
-    private fun fetch() {
-        page += 1
-        loading = true
-        val call = RetrofitInitializer().PhotoService().getProperties(page, "cats")
-        call.enqueue(object : Callback<PhotoData?> {
-            override fun onResponse(call: Call<PhotoData?>, response: Response<PhotoData?>) {
-                response?.body()?.let { item: PhotoData ->
-                    val imageList = ArrayList<String>()
-                    imageList.addAll(item.data.map {
-                        val id = if (it.isAlbum) {
-                            it.cover
-                        } else {
-                            it.id
-                        }
-                        "https://i.imgur.com/$id.jpg"
-                    })
-                    loading = false
-                    adapter.updateList(imageList)
-                }
-            }
-
-            override fun onFailure(call: Call<PhotoData?>?, t: Throwable?) {
-                Log.e("onFailure error", t?.message)
-                loading = false
             }
         })
     }
