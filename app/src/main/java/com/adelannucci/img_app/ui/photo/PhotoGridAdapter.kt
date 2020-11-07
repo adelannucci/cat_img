@@ -1,4 +1,4 @@
-package com.adelannucci.img_app.ui
+package com.adelannucci.img_app.ui.photo
 
 import android.content.Context
 
@@ -12,11 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.adelannucci.img_app.R
 import com.squareup.picasso.Picasso
 
-class ImageGridAdapter(
+class PhotoGridAdapter(
     private val c: Context,
     private val images: ArrayList<String> = ArrayList<String>()
 ) :
-    RecyclerView.Adapter<ImageGridAdapter.ViewHolder>() {
+    RecyclerView.Adapter<PhotoGridAdapter.ViewHolder>() {
 
 
     override fun getItemCount(): Int {
@@ -24,7 +24,7 @@ class ImageGridAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(c).inflate(R.layout.image_item, parent, false))
+        return ViewHolder(LayoutInflater.from(c).inflate(R.layout.photo_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -42,7 +42,7 @@ class ImageGridAdapter(
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val image: ImageView = itemView.findViewById<ImageView>(R.id.iv)
+        val image: ImageView = itemView.findViewById<ImageView>(R.id.photo)
     }
 
     fun updateList(images: List<String>) {

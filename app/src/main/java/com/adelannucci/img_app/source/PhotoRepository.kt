@@ -1,13 +1,15 @@
-package com.adelannucci.img_app.network
+package com.adelannucci.img_app.source
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.adelannucci.img_app.network.response.PhotoData
+import com.adelannucci.img_app.model.PhotoData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class PhotoRepository {
+
+    private val thumbnailUrl = "https://i.imgur.com/"
 
     private var photos: MutableLiveData<List<String>> = MutableLiveData()
 
@@ -23,7 +25,7 @@ class PhotoRepository {
                         } else {
                             it.id
                         }
-                        "https://i.imgur.com/$id.jpg"
+                        "$thumbnailUrl$id.jpg"
                     })
                     photos.value = imageList
                 }

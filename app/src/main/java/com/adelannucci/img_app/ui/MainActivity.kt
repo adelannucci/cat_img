@@ -1,4 +1,4 @@
-package com.adelannucci.img_app
+package com.adelannucci.img_app.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -6,12 +6,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.adelannucci.img_app.ui.ImageGridAdapter
-import com.adelannucci.img_app.ui.PhotoViewModel
+import com.adelannucci.img_app.R
+import com.adelannucci.img_app.ui.photo.PhotoGridAdapter
+import com.adelannucci.img_app.ui.photo.PhotoViewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private val adapter = ImageGridAdapter(this)
+    private val adapter = PhotoGridAdapter(this)
     private var recyclerView: RecyclerView? = null
     var viewModel: PhotoViewModel? = null
 
@@ -35,13 +36,11 @@ class MainActivity : AppCompatActivity() {
                     val visibleItemCount = this@MainActivity.recyclerView?.childCount ?: 0
                     val totalItemCount = adapter.itemCount
 
-                    val firstVisibleItems: IntArray =
-                        (this@MainActivity.recyclerView?.layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(
-                            null
-                        )
+                    val firstVisibleItems: IntArray = (this@MainActivity.recyclerView?.layoutManager
+                            as StaggeredGridLayoutManager).findFirstVisibleItemPositions(null)
 
                     val pastVisibleItems = if (firstVisibleItems.isNotEmpty()) {
-                        firstVisibleItems[0]
+                        firstVisibleItems.first()
                     } else {
                         0
                     }

@@ -1,11 +1,6 @@
-package com.adelannucci.img_app.network.response
+package com.adelannucci.img_app.model
 
 import com.google.gson.annotations.SerializedName
-
-
-data class PhotoData(
-    val data: List<Photo>
-)
 
 data class Photo(
     val id: String,
